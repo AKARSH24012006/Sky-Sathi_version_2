@@ -1,0 +1,45 @@
+# SkySathi 2.1 — one command:  docker compose up --build
+# web  -> http://localhost:3000   (nginx, proxies /api to the backend)
+# api  -> http://localhost:8000   (docs at /docs)
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: skysathi
+      POSTGRES_PASSWORD: skysathi
+      POSTGRES_DB: skysathi
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skysathi"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  api:
+    build: ./api
+    environment:
+      DATABASE_URL: postgresql+asyncpg://skysathi:skysathi@db:5432/skysathi
+      REDIS_URL: redis://redis:6379/0
+      # Optional keys — everything degrades gracefully without them:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      AERODATABOX_KEY: ${AERODATABOX_KEY:-}
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    ports: ["8000:8000"]
+
+  web:
+    build: ./web
+    depends_on: [api]
+    ports: ["3000:80"]
+
+volumes:
+  pgdata:

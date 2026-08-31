@@ -1,0 +1,9 @@
+{
+  "name": "SkySathi — Calm Flight Intelligence",
+  "short_name": "SkySathi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0E1420",
+  "theme_color": "#7FB4D9",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

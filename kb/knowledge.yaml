@@ -1,0 +1,75 @@
+# SkySathi Knowledge Base v2 — single source of truth.
+# Reviewed like code. Ingested into ChromaDB by api/scripts/ingest_kb.py,
+# bundled on-device for offline retrieval. calm: is the reassurance layer.
+- id: turbulence
+  tags: turbulence bumps chop shaking rough air patch scared
+  text: Turbulence is uneven air — to the aircraft it is like a gravel patch on a highway. The plane typically moves inches to a few feet while your body reports far more, and it has never brought down a modern commercial jet.
+  calm: Most patches are forecast before boarding, and the companion warns you before each one.
+- id: wings
+  tags: wing wings lift flex break bend snap stay up
+  text: Wings generate lift continuously from air moving over and under them, and they are flexible by design — in certification tests they are bent several meters upward before anything gives.
+  calm: A flexing wing in bumps is a healthy wing absorbing them.
+- id: engines
+  tags: engine engines thrust power fail failure stopped one
+  text: Airliners carry two engines so that either one alone can fly the entire aircraft, and pilots rehearse single-engine flying in simulators every year.
+  calm: It is a practiced skill, not a crisis.
+- id: flaps
+  tags: flap flaps hum whir motor sliding wing bigger slow
+  text: Flaps slide out to make the wing larger and more curved so the plane can fly slowly and safely near the ground; the hum before landing is their motors working as designed.
+  calm: Flap position is continuously monitored and matched to speed.
+- id: gear
+  tags: gear wheels landing thud clunk rumble whirr fold retract
+  text: The landing gear folds away about 30 seconds after takeoff and returns roughly five minutes before landing — the whirr is the motor, and the thud is the locks engaging.
+  calm: Even if the motor failed, gravity alone can drop and lock the gear.
+- id: sounds
+  tags: sound sounds noise ding chime dings bell weird hear
+  text: Every routine aircraft sound has a routine cause — gear, flaps, power changes, and cabin chimes the crew use to talk to each other.
+  calm: The pattern of sounds you hear matches this phase of flight.
+- id: ears
+  tags: ear ears pop full pressure hurt block
+  text: Your ears react to gentle cabin-pressure changes during climb and descent; swallowing, yawning, or sipping water equalizes them within minutes.
+  calm: It is uncomfortable, not harmful, and it always passes.
+- id: cabin-pressure
+  tags: cabin pressure pressurized breathe air oxygen altitude
+  text: The cabin is pressurized to feel like a pleasant hill town at about 6,800 ft, with air fully refreshed every 2-3 minutes through hospital-grade filters.
+  calm: Pressurization is automatic, monitored, and backed up.
+- id: safety
+  tags: safe safety crash statistics dangerous risk die afraid
+  text: Commercial flying is the safest form of travel humans have built — the drive to the airport carries more risk than the flight itself.
+  calm: Everything measurable about your flight right now is steady and normal.
+- id: landing
+  tags: landing land touchdown firm hard bounce runway
+  text: Landing is the most practiced maneuver in aviation, and a firm touchdown is intentional — pilots plant the wheels for grip, especially on wet runways.
+  calm: Soft landings are for style; firm ones are for safety.
+- id: go-around
+  tags: go-around go around abort climb again circle retry
+  text: A go-around is the pilots choosing to climb and circle for a better-lined-up landing — a routine, well-rehearsed procedure practiced in every simulator session.
+  calm: It is a sign of good judgement, never an emergency.
+- id: pilots
+  tags: pilot pilots cockpit training captain crew qualified
+  text: Two fully qualified pilots fly every flight, each able to handle the whole journey alone, cross-checking every action, with simulator re-checks every six months.
+  calm: They have rehearsed everything imaginable until it is boring.
+- id: atc
+  tags: atc control tower radar tracked watched controller lost
+  text: From pushback to parking the flight is watched continuously by air traffic controllers who keep kilometres of spacing between aircraft, tracked by radar, satellites, and transponders.
+  calm: Someone on the ground always knows exactly where you are.
+- id: weather
+  tags: weather storm rain lightning cloud radar avoid
+  text: Pilots see weather far ahead on radar and route around uncomfortable areas; aircraft are struck by lightning about once a year each and are built to shrug it off.
+  calm: Rain at landing simply means a firmer, grippier touchdown — planned that way.
+- id: apu
+  tags: apu auxiliary power tail generator boarding sound
+  text: The APU is a small extra engine in the tail cone that powers the aircraft at the gate and can restart the main engines — one more independent power source.
+  calm: That jet sound during boarding before the engines start is the APU.
+- id: fuel
+  tags: fuel tank tanks enough run out reserve
+  text: Fuel is carried inside the wings, and regulations require enough extra to divert to another airport and still circle for over 30 minutes.
+  calm: Quantity is checked by the crew and cross-checked by dispatchers before every flight.
+- id: stomach-drop
+  tags: stomach drop sink falling feeling floating dip
+  text: That dropping feeling is your inner ear noticing a gentle change in climb or descent before your eyes do; the actual movement is small and fully controlled.
+  calm: Sensors confirm a smooth, standard profile when it happens.
+- id: redundancy
+  tags: backup backups systems fail redundancy hydraulics computer
+  text: Everything critical on an airliner exists at least twice — hydraulics, electrics, computers, even the pilots — under a design rule that no single failure may ever be dangerous.
+  calm: Redundancy is the entire philosophy of aircraft design.

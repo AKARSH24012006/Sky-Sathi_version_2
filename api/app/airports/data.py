@@ -1,0 +1,25 @@
+AIRPORTS = {
+ "DEL":{"lat":28.556,"lon":77.100,"city":"Delhi","name":"Indira Gandhi Intl","tz":"Asia/Kolkata"},
+ "BLR":{"lat":13.199,"lon":77.706,"city":"Bengaluru","name":"Kempegowda Intl","tz":"Asia/Kolkata"},
+ "BOM":{"lat":19.089,"lon":72.868,"city":"Mumbai","name":"Chhatrapati Shivaji Intl","tz":"Asia/Kolkata"},
+ "MAA":{"lat":12.990,"lon":80.169,"city":"Chennai","name":"Chennai Intl","tz":"Asia/Kolkata"},
+ "HYD":{"lat":17.231,"lon":78.430,"city":"Hyderabad","name":"Rajiv Gandhi Intl","tz":"Asia/Kolkata"},
+ "CCU":{"lat":22.654,"lon":88.447,"city":"Kolkata","name":"Netaji Subhas Chandra Bose Intl","tz":"Asia/Kolkata"},
+ "AMD":{"lat":23.077,"lon":72.635,"city":"Ahmedabad","name":"Sardar Vallabhbhai Patel Intl","tz":"Asia/Kolkata"},
+ "GOI":{"lat":15.381,"lon":73.831,"city":"Goa","name":"Manohar Intl","tz":"Asia/Kolkata"},
+ "COK":{"lat":10.152,"lon":76.392,"city":"Kochi","name":"Cochin Intl","tz":"Asia/Kolkata"},
+ "PNQ":{"lat":18.582,"lon":73.920,"city":"Pune","name":"Pune Intl","tz":"Asia/Kolkata"},
+}
+AMENITIES = {  # seeded from the prototype's DEL T3 pack; production loads per-terminal datasets
+ "DEL":[{"kind":"lounge","name":"Encalm Lounge","walk_min":4,"near":"Gate 18"},
+        {"kind":"charging","name":"Charging points","walk_min":0,"near":"Gates 22-26"},
+        {"kind":"restroom","name":"Restroom","walk_min":2,"near":"opposite Gate 23"},
+        {"kind":"coffee","name":"Starbucks","walk_min":3,"near":"Gate 21"},
+        {"kind":"food","name":"Punjab Grill Express","walk_min":6,"near":"main corridor"},
+        {"kind":"shopping","name":"Duty-free strip","walk_min":8,"near":"toward Gate 15"},
+        {"kind":"washroom","name":"Restrooms","walk_min":2,"near":"opposite Gate 23"},
+        {"kind":"prayer","name":"Prayer & meditation room","walk_min":5,"near":"mezzanine, Gate 20"},
+        {"kind":"quiet","name":"Quiet zone","walk_min":6,"near":"past Gate 17"},
+        {"kind":"water","name":"Water refill station","walk_min":1,"near":"beside Gate 24"},
+        {"kind":"play","name":"Children's play area","walk_min":7,"near":"food court level"}],
+}

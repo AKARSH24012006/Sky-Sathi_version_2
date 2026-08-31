@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "SkySathi",
+    "slug": "skysathi",
+    "scheme": "skysathi",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "ios": {
+      "bundleIdentifier": "com.skysathi.app",
+      "infoPlist": {
+        "NSMotionUsageDescription": "SkySathi reads motion to explain what the aircraft is doing. Data never leaves your device.",
+        "NSMicrophoneUsageDescription": "Sound level (never recordings) helps identify normal aircraft sounds.",
+        "NSLocationWhenInUseUsageDescription": "Speed and altitude let SkySathi narrate your flight. Optional.",
+        "UIBackgroundModes": ["location", "audio"]
+      }
+    },
+    "android": {
+      "package": "com.skysathi.app",
+      "permissions": ["ACCESS_FINE_LOCATION", "RECORD_AUDIO", "FOREGROUND_SERVICE", "POST_NOTIFICATIONS"]
+    }
+  }
+}
