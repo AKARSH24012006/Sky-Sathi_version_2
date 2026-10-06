@@ -1,4 +1,4 @@
-# SkySathi 2.1 — one command:  docker compose up --build
+# SkySathi 4.1 — one command:  docker compose up --build
 # web  -> http://localhost:3000   (nginx, proxies /api to the backend)
 # api  -> http://localhost:8000   (docs at /docs)
 services:
@@ -30,10 +30,16 @@ services:
       REDIS_URL: redis://redis:6379/0
       # Optional keys — everything degrades gracefully without them:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      # Any OpenAI-compatible LLM (Groq, Gemini /openai/, Ollama) — optional:
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://api.openai.com/v1}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      KB_PATH: /kb/knowledge.yaml
       AERODATABOX_KEY: ${AERODATABOX_KEY:-}
     depends_on:
       db: { condition: service_healthy }
       redis: { condition: service_healthy }
+    volumes: ["./kb:/kb:ro"]   # the pilot-reviewed knowledge base (was missing from the image)
     ports: ["8000:8000"]
 
   web:

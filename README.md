@@ -1,4 +1,4 @@
-# SkySathi 4.0 — Calm Flight Intelligence
+# SkySathi 4.1 — Calm Flight Intelligence
 
 An AI companion for anxious and first-time flyers: it detects the flight through
 the phone's own sensors, explains every sound and sensation before you can worry
@@ -22,7 +22,7 @@ Then open:
 
 **No .env file is needed.** Every setting has a working default; the database
 creates its own tables on first boot. Optional keys (all degrade gracefully):
-`OPENAI_API_KEY` (LLM chat — without it, answers come from the grounded KB),
+`OPENAI_API_KEY` or `LLM_BASE_URL`/`LLM_API_KEY`/`LLM_MODEL` for any OpenAI-compatible model (LLM generation; without it, answers are extractive from the grounded KB),
 `AERODATABOX_KEY` (live gates — without it, clearly-badged demo data).
 
 ## Architecture
@@ -67,6 +67,25 @@ asks before deleting the Docker volume.
 The UI never shows undefined/null/NaN — always an em dash or a kind placeholder.
 Demo data is always labeled ("demo data · API offline"). Real sources are
 credited (open-meteo, adsb.lol). The panic/Calm feature is never paywalled.
+
+## What's new in 4.1: GenAI pipeline + GenAI Lab
+The copilot is now a **fixed, linear GenAI pipeline** (`api/app/ai/pipeline.py`). Every reply carries a stage-by-stage trace:
+
+| # | Stage | Family | File |
+|---|---|---|---|
+| 1 | Normalise, tokenise, language-ID (EN/HI/Hinglish), entities | NLP | `ai/nlp.py` |
+| 2 | Anxiety-band + intent classifiers (TF-IDF → Logistic Regression, 197 labelled utterances) | ML | `ai/classifier.py`, `ai/data/utterances.csv` |
+| 3 | Hybrid retrieval: BM25 ⊕ MiniLM transformer embeddings, RRF fusion | DL / Transformer, RAG | `ai/rag.py` |
+| 4 | Prompt assembly from 7 named techniques | Prompt engineering | `ai/prompts.py` |
+| 5 | LLM generation (OpenAI-compatible: OpenAI, Gemini, Groq, Ollama) | GenAI | `ai/llm.py` |
+| 6 | Guardrails: citations, sentence cap, banned words, JSON, emergency prefix | Safety | `ai/guardrails.py` |
+
+**In the app:** Copilot → **Chat** (tap "how" under any answer), **Prompt Lab** (5 use cases × 7 techniques, side by side,
+with the exact prompt and metrics), **Pipeline & Eval** (live diagram and objective-linked evaluation report).
+**API:** `GET /genai/overview` · `POST /genai/run` · `POST /genai/prompt-lab` · `GET /genai/eval`. No DB/auth needed.
+**Evaluate:** `cd api && python scripts/evaluate.py` writes `eval/REPORT.md` (with an LLM key it also compares techniques).
+**Tests:** `cd api && pytest -q`.
+Review-2 material: `docs/REVIEW2_SLIDES.md`, `docs/pipeline-diagram.png`.
 
 ## What's new in 4.0
 A complete application: six-tab navigation (Home / Flights / Journey / Copilot /

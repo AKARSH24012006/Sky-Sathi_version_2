@@ -1,0 +1,198 @@
+text,anxiety,intent
+what keeps the plane up in the air,calm,explain
+how do wings generate lift,calm,explain
+why do planes fly so high,calm,explain
+what is the apu,calm,explain
+what does the captain do during cruise,calm,explain
+how fast are we going right now,calm,explain
+what is that whirring sound under the floor,raised,explain
+why did the engines get quieter after takeoff,raised,explain
+why are the flaps coming out,calm,explain
+what are the dings i keep hearing,raised,explain
+explain how autopilot works,calm,explain
+why is the cabin pressurised,calm,explain
+how much fuel does an a320 carry,calm,explain
+what is a go around,calm,explain
+why do pilots turn right after takeoff,calm,explain
+why does the plane bank so much,raised,explain
+what is that thud after takeoff,raised,explain
+how do pilots see weather ahead,calm,explain
+what is clear air turbulence,calm,explain
+how does air traffic control track us,calm,explain
+why do my ears pop on descent,raised,explain
+why was the landing so firm,raised,explain
+what is the loud roar after landing,raised,explain
+why are we stopping and starting on the taxiway,calm,explain
+how do airplanes handle lightning,calm,explain
+what does cruising altitude mean,calm,explain
+explain the sounds before landing,calm,explain
+why do the wings flex,raised,explain
+why do the lights dim at takeoff,calm,explain
+how long do pilots train,calm,explain
+plane itni upar kaise udta hai,calm,explain
+yeh awaaz kis cheez ki hai,raised,explain
+landing gear kab bahar aata hai,calm,explain
+pilot kya kar rahe hain abhi,calm,explain
+kaan kyun band ho rahe hain,raised,explain
+i am scared of turbulence,raised,reassure
+is turbulence dangerous,raised,reassure
+can turbulence break the wings,high,reassure
+i hate this shaking please tell me its fine,high,reassure
+what if an engine fails,raised,reassure
+can the plane fall out of the sky,high,reassure
+i feel nervous about takeoff,raised,reassure
+am i safe right now,raised,reassure
+is it normal for the plane to drop like that,high,reassure
+the wing is moving a lot is that okay,high,reassure
+what if the pilots make a mistake,raised,reassure
+i keep thinking we will crash,high,reassure
+is flying really safer than driving,raised,reassure
+what if we run out of fuel,raised,reassure
+i dont trust this old plane,raised,reassure
+the bumps are getting worse,high,reassure
+why does my stomach drop like that,raised,reassure
+im worried about the storm outside,raised,reassure
+can lightning hit us,raised,reassure
+it feels like we are falling,high,reassure
+the noise just changed is something wrong,high,reassure
+i am anxious about landing in rain,raised,reassure
+tell me everything is ok,high,reassure
+will the turbulence stop soon,raised,reassure
+how bad is this turbulence,raised,reassure
+is a firm landing dangerous,raised,reassure
+what if the landing gear doesnt come down,raised,reassure
+i get nervous every time i fly,raised,reassure
+first time flying and im a bit scared,raised,reassure
+the plane is shaking so much,high,reassure
+can the doors open mid flight,raised,reassure
+mujhe turbulence se dar lagta hai,raised,reassure
+kya plane gir sakta hai,high,reassure
+bahut hil raha hai sab theek hai na,high,reassure
+dar lag raha hai,high,reassure
+engine band ho gaya toh kya hoga,raised,reassure
+pehli baar flight le raha hoon thoda darr hai,raised,reassure
+i cant breathe,high,panic
+i am having a panic attack,high,panic
+my heart is racing i need help,high,panic
+i need to get off this plane now,high,panic
+help me calm down please,high,panic
+im shaking and cant stop,high,panic
+i feel like im going to faint,high,panic
+please make it stop i am terrified,high,panic
+i think im going to throw up from fear,high,panic
+everything is spinning i am so scared,high,panic
+i cant do this anymore,high,panic
+my hands are sweating and i cant think,high,panic
+breathe with me please,high,panic
+i want to scream,high,panic
+panic ho raha hai,high,panic
+saans nahi aa rahi,high,panic
+mujhe bahut ghabrahat ho rahi hai,high,panic
+please help i am freaking out,high,panic
+i feel trapped in here,high,panic
+chest is tight and im scared,high,panic
+where is my gate,calm,logistics
+how much time until boarding,calm,logistics
+when does boarding start,calm,logistics
+is my flight on time,calm,logistics
+nearest coffee to my gate,calm,logistics
+how long is the walk to gate 42,calm,logistics
+what is the weather in bengaluru,calm,logistics
+when do we land,calm,logistics
+which belt for baggage,calm,logistics
+can i carry a power bank,calm,logistics
+what should i pack for rain,calm,logistics
+plan my first hour in bengaluru,calm,logistics
+is there a delay on ai101,raised,logistics
+my flight is delayed what do i do,raised,logistics
+will i miss my connection,raised,logistics
+how early should i reach the airport,calm,logistics
+where is the security check,calm,logistics
+can i take water through security,calm,logistics
+gate change ho gaya kya,calm,logistics
+boarding kab shuru hogi,calm,logistics
+flight time pe hai kya,calm,logistics
+how long is the flight to bengaluru,calm,logistics
+what time is it in bengaluru,calm,logistics
+do i need to print my boarding pass,calm,logistics
+which terminal is indigo at delhi,calm,logistics
+im late will they wait for me,raised,logistics
+is there wifi on board,calm,logistics
+hi,calm,chitchat
+hello sathi,calm,chitchat
+thank you that helped,calm,chitchat
+thanks im feeling better,calm,chitchat
+good morning,calm,chitchat
+who are you,calm,chitchat
+what can you do,calm,chitchat
+you are nice,calm,chitchat
+ok,calm,chitchat
+namaste,calm,chitchat
+shukriya,calm,chitchat
+tell me a fun fact about planes,calm,chitchat
+im bored,calm,chitchat
+lets talk about something else,calm,chitchat
+that was a smooth landing thanks,calm,chitchat
+bye,calm,chitchat
+you are a good copilot,calm,chitchat
+thoda better feel ho raha hai,calm,chitchat
+what is your name,calm,chitchat
+cool,calm,chitchat
+how does the plane know where to go,calm,explain
+what is the black box,calm,explain
+why do we keep the window shades up for landing,calm,explain
+what is the seatbelt sign for,calm,explain
+how heavy is this plane,calm,explain
+how cold is it outside at 36000 feet,calm,explain
+why are the engines so loud on the runway,raised,explain
+what was that bang when we landed,raised,explain
+why is the wing shaking a little,raised,explain
+why did the plane suddenly climb again,raised,explain
+what does the chime before landing mean,raised,explain
+why does the plane wobble near the runway,raised,explain
+is it normal that the engines changed sound,raised,reassure
+i am a little uneasy about this flight,raised,reassure
+honestly im kind of nervous,raised,reassure
+should i be worried about the clouds,raised,reassure
+not sure i like these bumps,raised,reassure
+can you reassure me about the descent,raised,reassure
+i always worry during landing,raised,reassure
+thoda nervous hoon,raised,reassure
+kya yeh normal hai,raised,reassure
+weather kharab hai kya safe hai,raised,reassure
+the drop just now really scared me,high,reassure
+i am terrified the wing will snap,high,reassure
+we are going to die arent we,high,reassure
+this is the worst turbulence ever,high,reassure
+i am crying please say something,high,panic
+i cant stop shaking help,high,panic
+i feel dizzy and scared,high,panic
+my breathing is too fast,high,panic
+ghabrahat se haath kaanp rahe hain,high,panic
+please talk me through this i am panicking,high,panic
+hey there,calm,chitchat
+good evening sathi,calm,chitchat
+nice to meet you,calm,chitchat
+you made me feel better,calm,chitchat
+haha that is funny,calm,chitchat
+okay thanks,calm,chitchat
+great,calm,chitchat
+tell me a joke,calm,chitchat
+how are you,calm,chitchat
+dhanyavaad,calm,chitchat
+accha,calm,chitchat
+see you after landing,calm,chitchat
+what is your favourite plane,calm,chitchat
+can you talk in hindi,calm,chitchat
+nothing just saying hi,calm,chitchat
+appreciate it,calm,chitchat
+when will the food come,calm,logistics
+how long until we reach,calm,logistics
+where do i collect my bags,calm,logistics
+is the flight full,calm,logistics
+what is my seat number,calm,logistics
+how do i get a cab from bengaluru airport,calm,logistics
+landing kitne baje hai,calm,logistics
+flight delay hai kya,raised,logistics
+gate kaha hai,calm,logistics
+my connection is tight will i make it,raised,logistics

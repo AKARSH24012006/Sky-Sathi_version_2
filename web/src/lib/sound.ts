@@ -70,6 +70,46 @@ export const snd = {
     g.gain.exponentialRampToValueAtTime(0.04, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.08);
     o.start(t); o.stop(t + 0.1);
   },
+  /** one-shot demo sounds for the "What was that sound?" explainer — the user
+   *  pressed play, so these work even when ambient sound is off */
+  play(kind: "chime" | "spool" | "gear" | "flaps" | "apu" | "thunder" | "reverse"): number {
+    const a = ac(), t = a.currentTime;
+    const noise = (freq: number, peak: number, attack: number, hold: number, release: number, type: BiquadFilterType = "lowpass") => {
+      const src = a.createBufferSource(); src.buffer = noiseBuffer(a, true);
+      const f = a.createBiquadFilter(); f.type = type; f.frequency.value = freq;
+      const g = a.createGain(); g.gain.value = 0;
+      src.connect(f); f.connect(g); g.connect(a.destination);
+      g.gain.setTargetAtTime(peak, t, attack); g.gain.setTargetAtTime(0, t + hold, release);
+      src.start(t); src.stop(t + hold + release * 6);
+      return f;
+    };
+    const tone = (type: OscillatorType, f0: number, f1: number, peak: number, start: number, dur: number) => {
+      const o = a.createOscillator(), g = a.createGain(), lp = a.createBiquadFilter();
+      o.type = type; o.frequency.setValueAtTime(f0, t + start); o.frequency.linearRampToValueAtTime(f1, t + start + dur);
+      lp.type = "lowpass"; lp.frequency.value = 900; g.gain.value = 0;
+      o.connect(lp); lp.connect(g); g.connect(a.destination);
+      g.gain.setTargetAtTime(peak, t + start, 0.08); g.gain.setTargetAtTime(0, t + start + dur - 0.2, 0.15);
+      o.start(t + start); o.stop(t + start + dur + 1);
+    };
+    switch (kind) {
+      case "chime": { const was = enabled; enabled = true; this.ding(); enabled = was; return 1.2; }
+      case "spool": { const f = noise(150, 0.16, 0.6, 3.2, 0.6); f.frequency.linearRampToValueAtTime(900, t + 3); tone("sawtooth", 90, 260, 0.03, 0, 3.4); return 4; }
+      case "gear": { tone("sawtooth", 110, 150, 0.045, 0, 2.2); setTimeout(() => this.thud(), 2300); return 3; }
+      case "flaps": { tone("triangle", 180, 200, 0.05, 0, 2.6); tone("sine", 360, 390, 0.015, 0, 2.6); return 3; }
+      case "apu": { noise(2400, 0.04, 0.3, 3, 0.5, "bandpass"); tone("sine", 1850, 1870, 0.012, 0, 3); noise(300, 0.05, 0.3, 3, 0.5); return 3.5; }
+      case "thunder": { const was = enabled; enabled = true; this.thunder(); enabled = was; return 3; }
+      case "reverse": { const f = noise(300, 0.22, 0.3, 2.6, 0.9); f.frequency.linearRampToValueAtTime(1100, t + 1); return 3.5; }
+    }
+    return 2;
+  },
+  thud() {
+    const a = ac(), t = a.currentTime;
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = "sine"; o.frequency.setValueAtTime(90, t); o.frequency.exponentialRampToValueAtTime(40, t + 0.25);
+    g.gain.value = 0.0001; o.connect(g); g.connect(a.destination);
+    g.gain.exponentialRampToValueAtTime(0.25, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+    o.start(t); o.stop(t + 0.4);
+  },
   thunder() {
     if (!enabled) return;
     const a = ac(), t = a.currentTime;

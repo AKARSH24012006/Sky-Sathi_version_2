@@ -1,18 +1,15 @@
-"""Ingest kb/knowledge.yaml into ChromaDB (persistent, local ./chroma).
-Run once at deploy or whenever the KB changes:  python scripts/ingest_kb.py
-Uses Chroma's built-in embedding function to start (all-MiniLM); swap to
-bge-m3 for multilingual Hindi retrieval in production."""
-import pathlib, yaml
-import chromadb
+"""Pre-download the transformer encoder and check retrieval over kb/knowledge.yaml.
 
-ROOT = pathlib.Path(__file__).resolve().parents[2]
-kb = yaml.safe_load((ROOT / "kb" / "knowledge.yaml").read_text(encoding="utf-8"))
+The KB is small (tens of entries), so embeddings are computed in memory at API
+start-up — no vector-DB ingestion step is required. Run this once with internet
+so the MiniLM model is cached before an offline demo:
 
-client = chromadb.PersistentClient(path=str(ROOT / "api" / "chroma"))
-col = client.get_or_create_collection("skysathi_kb")
-col.upsert(
-    ids=[e["id"] for e in kb],
-    documents=[e["text"] + " " + e.get("calm", "") for e in kb],
-    metadatas=[{"tags": e["tags"], "calm": e.get("calm", "")} for e in kb],
-)
-print(f"ingested {len(kb)} KB entries -> {ROOT/'api'/'chroma'}")
+    pip install -r requirements-ai.txt && python scripts/ingest_kb.py
+"""
+import pathlib, sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
+from app.ai import rag
+
+print("retriever:", rag.retriever_name())
+for q in ("the wing is bending", "what was that thud", "kaan band ho gaye"):
+    print(f"  {q!r:28} ->", [(h["id"], h["cosine"]) for h in rag.search(q)["hits"]])

@@ -1,0 +1,21 @@
+# secrets — never commit your real keys
+.env
+api/.env
+# dependencies & builds
+node_modules/
+web/dist/
+mobile/.expo/
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+# generated
+api/chroma/
+api/eval/report.json
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useApp } from "../store";
 import { fmt } from "../lib/api";
+import SoundExplainer from "../components/SoundExplainer";
 
-export default function Journey() {
+export default function Journey({ go }: { go: (t: string) => void }) {
   const s = useApp();
   const [openTopic, setOpenTopic] = useState<string | null>(null);
   return <>
@@ -22,12 +23,10 @@ export default function Journey() {
         </div></div>
     </div>
 
-    <div className="card" style={{ marginTop: 14 }}><p className="eyebrow">Delhi T3 · near Gate {fmt(s.flight?.gate)}</p>
-      {s.amens.length ? s.amens.map((a, i) =>
-        <div className="amen" key={i}><span><b style={{ textTransform: "capitalize" }}>{fmt(a.name)}</b> · {fmt(a.near)}</span><span className="w">{fmt(a.walk_min, " min walk")}</span></div>)
-        : <p className="sub" style={{ marginTop: 8 }}>Gate-area amenities appear when the backend is running (./start.sh).</p>}
-      <p className="sub" style={{ marginTop: 10, fontSize: 12 }}>Indoor walking navigation needs the airport's map partnership — coming soon, honestly.</p>
-    </div>
+    <div style={{ marginTop: 14 }}><SoundExplainer onAsk={q => { go("copilot"); s.ask(q); }} /></div>
+    <div className="card" style={{ marginTop: 14 }}><p className="eyebrow">Terminal navigation</p>
+      <p className="sub" style={{ marginTop: 8 }}>Washrooms, food, your gate and the cab pickup — ask in plain words and SkySathi draws the route.</p>
+      <button className="btn" onClick={() => go("airport")}>Open the airport navigator</button></div>
 
     <div className="card" id="academy" style={{ marginTop: 14 }}><p className="eyebrow">Academy · how flying works</p>
       {s.kb.length ? <>

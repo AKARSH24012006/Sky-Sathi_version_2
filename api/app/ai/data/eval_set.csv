@@ -1,0 +1,26 @@
+question,gold,language
+can turbulence break the wings,turbulence|wings,en
+why does the plane shake in clouds,turbulence|weather,en
+the wing is bending up and down is that ok,wings,en
+what if one engine stops working,engines|redundancy,en
+why did the engines get quieter after takeoff,engines|sounds,en
+what is the whirring noise before landing,flaps|gear,en
+what was that thud under the floor after takeoff,gear,en
+what are the ding dong sounds in the cabin,sounds,en
+why do my ears hurt when we come down,ears|cabin-pressure,en
+is there enough oxygen up here,cabin-pressure,en
+is flying actually safe,safety,en
+why was the touchdown so hard,landing,en
+we suddenly climbed again instead of landing,go-around,en
+are the pilots properly trained,pilots,en
+does anyone on the ground know where we are,atc,en
+can lightning hit the plane,weather,en
+what is that jet noise at the gate before engines start,apu,en
+what if we run out of fuel,fuel,en
+my stomach dropped just now,stomach-drop,en
+what happens if the computers fail,redundancy,en
+kya turbulence se plane gir sakta hai,turbulence|safety,hinglish
+engine ki awaaz kam kyun ho gayi,engines|sounds,hinglish
+kaan band ho gaye hain,ears,hinglish
+pilot kitne trained hote hain,pilots,hinglish
+landing itni zor se kyun hui,landing,hinglish

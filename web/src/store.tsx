@@ -3,25 +3,29 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { SeqState, Telem, WeatherFx } from "./components/Aircraft3D";
 import { PHASES, type Phase } from "./lib/sequence";
-import { api, type Weather, type LiveFlight, type KbEntry, type Amenity } from "./lib/api";
+import { api, type Weather, type LiveFlight, type KbEntry, type Amenity, type TraceStage } from "./lib/api";
 import { snd } from "./lib/sound";
 import { airlineFor } from "./lib/airlines";
+import { local } from "./lib/safeStorage";
 
 const DEMO_FLIGHT_NO = "AI101"; // change this if a different flight is airborne at demo time
 
-export type Msg = { who: "u" | "a"; text: string; chips?: { label: string; q: string }[] };
+export type Msg = { who: "u" | "a"; text: string; chips?: { label: string; q: string }[];
+  meta?: { trace: TraceStage[]; citations: string[]; anxiety: string; intent: string; generator: string; total_ms: number } };
 export type Prefs = { theme: string; anim: string; font: string; cb: boolean; voice: boolean; units: string; mode: "calm" | "educational" | "child" };
 export type Notif = { id: number; title: string; body: string; t: string };
 const CHECKLIST = ["Passport & ID in hand bag", "Boarding pass downloaded", "Power bank charged", "Water bottle (empty for security)", "Medication in cabin bag", "Leave for airport (traffic-safe time)"];
-const PREFS0: Prefs = JSON.parse(localStorage.getItem("ss:prefs") || "null") || { theme: "auto", anim: "full", font: "std", cb: false, voice: true, units: "metric", mode: "calm" };
-const themeFor = (h: number) => h < 5 ? "night" : h < 9 ? "morning" : h < 16 ? "day" : h < 18.5 ? "sunset" : h < 20 ? "twilight" : "night";
+const PREFS0: Prefs = JSON.parse(local.get("ss:prefs") || "null") || { theme: "auto", anim: "full", font: "std", cb: false, voice: true, units: "metric", mode: "calm" };
+const themeFor = (h: number) => (h >= 6 && h < 18.5 ? "day" : "night");
+/** 4.2 has two designed themes; older saved choices map onto them. */
+const normTheme = (t: string) => (["auto", "day", "night", "aurora"].includes(t) ? t : ["morning", "sunset"].includes(t) ? "day" : "night");
 
 function useStore() {
   const seq = useRef<SeqState>({ t: 0, playing: false });
   const [phase, setPhase] = useState<Phase>(PHASES[0]);
   const [progress, setProgress] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [telem, setTelem] = useState<Telem>({ alt: 0.68, thr: 0.55, progress: 0, ground: false, turb: false });
+  const [telem, setTelem] = useState<Telem>({ alt: 0.68, thr: 0.55, progress: 0, ground: false, turb: false, pitch: 1.5, bank: 0 });
   const [vspd, setVspd] = useState(0);
   const prevAlt = useRef(0.68);
   const [wxDel, setWxDel] = useState<Weather | null>(null);
@@ -33,7 +37,7 @@ function useStore() {
   const [boardIn, setBoardIn] = useState(18 * 60);
   const [soundOn, setSoundOn] = useState(false);
   const [prefs, setPrefs] = useState<Prefs>(PREFS0);
-  const [checks, setChecks] = useState<boolean[]>(() => JSON.parse(localStorage.getItem("ss:checks") || "null") || CHECKLIST.map(() => false));
+  const [checks, setChecks] = useState<boolean[]>(() => JSON.parse(local.get("ss:checks") || "null") || CHECKLIST.map(() => false));
   const [msgs, setMsgs] = useState<Msg[]>([{ who: "a", text: "Namaste, Akarsh — I'm your copilot. Press Begin Flight and I'll narrate every phase, or ask me anything." }]);
   const [thinking, setThinking] = useState(false);
   const [notifs, setNotifs] = useState<Notif[]>([]);
@@ -57,10 +61,10 @@ function useStore() {
     }, 5 * 60 * 1000);
     return () => { clearInterval(id); clearInterval(wxId); };
   }, []);
-  useEffect(() => { localStorage.setItem("ss:checks", JSON.stringify(checks)); }, [checks]);
+  useEffect(() => { local.set("ss:checks", JSON.stringify(checks)); }, [checks]);
   useEffect(() => {
-    localStorage.setItem("ss:prefs", JSON.stringify(prefs));
-    document.documentElement.dataset.theme = prefs.theme === "auto" ? themeFor(new Date().getHours() + new Date().getMinutes() / 60) : prefs.theme;
+    local.set("ss:prefs", JSON.stringify(prefs));
+    document.documentElement.dataset.theme = prefs.theme === "auto" ? themeFor(new Date().getHours() + new Date().getMinutes() / 60) : normTheme(prefs.theme);
     document.body.classList.toggle("largefont", prefs.font === "large");
     document.body.classList.toggle("cb", prefs.cb);
     document.body.classList.toggle("no-motion", prefs.anim === "reduced");
@@ -70,8 +74,8 @@ function useStore() {
   const greet = hour < 5 ? "Up late" : hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : hour < 21 ? "Good evening" : "Good night";
   const wxFx: WeatherFx = { code: wxBlr?.code ?? 61, night: hour < 6 || hour > 19 };
 
-  const say = (text: string, chips?: Msg["chips"]) => {
-    setMsgs(m => [...m, { who: "a", text, chips }]);
+  const say = (text: string, chips?: Msg["chips"], meta?: Msg["meta"]) => {
+    setMsgs(m => [...m, { who: "a", text, chips, meta }]);
     if (prefs.voice && soundOn && "speechSynthesis" in window) {
       const u = new SpeechSynthesisUtterance(text); u.rate = 0.96; speechSynthesis.speak(u);
     }
@@ -79,10 +83,11 @@ function useStore() {
   const ask = async (q: string) => {
     if (!q) return;
     setMsgs(m => [...m, { who: "u", text: q }]); setThinking(true);
-    const prefix = prefs.mode === "child" ? "Explain very simply for a curious child: " : prefs.mode === "educational" ? "Explain with a little technical depth: " : "";
-    const r = await api.chat(prefix + q, prefs.mode === "calm" ? "raised" : "calm");
+    // audience mode + live flight state go to the backend pipeline; the ML classifier decides the anxiety band
+    const live = playing ? { phase: phase.label, altitude_ft: Math.round(telem.alt * 36000), turbulence: telem.turb ? "light" : "none" } : {};
+    const r = await api.chat(q, prefs.mode, live, telem.turb ? "raised" : "auto");
     setThinking(false);
-    if (r) say(r.reply);
+    if (r) say(r.reply, undefined, { trace: r.trace, citations: r.citations, anxiety: r.anxiety, intent: r.intent, generator: r.generator, total_ms: r.total_ms });
     else {
       const local = kb.find(e => q.toLowerCase().split(" ").some(w => w.length > 3 && e.tags.includes(w)));
       say(local ? `${local.text} ${local.calm}` : "I can't reach my full brain right now, but here's what's always true: flying is the safest way humans travel. (Run ./start.sh for full answers.)");

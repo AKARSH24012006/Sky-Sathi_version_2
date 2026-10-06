@@ -1,9 +1,10 @@
+import { local } from "../lib/safeStorage";
 import { useApp } from "../store";
 import { airlineFor } from "../lib/airlines";
 
 export default function Profile({ openSettings }: { openSettings: () => void }) {
   const s = useApp();
-  const flights = Number(localStorage.getItem("ss:flights") || (s.progress >= 1 ? 1 : 0)) + (s.progress >= 1 ? 0 : 0);
+  const flights = Number(local.get("ss:flights") || (s.progress >= 1 ? 1 : 0)) + (s.progress >= 1 ? 0 : 0);
   const done = s.checks.filter(Boolean).length;
   const ach = [
     { t: "First wings", d: "Complete a flight", on: flights > 0 || s.progress >= 1 },

@@ -1,0 +1,85 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>SkySathi GenAI Pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#14202E;--ink2:#4A5B6E;--ink3:#7A8A9C;--line:#C9D5E1;--sky:#3E6E93;--skyL:#E6F0F8;--sage:#3F8A63;--sageL:#E5F3EA;--amber:#B07A2E;--amberL:#FBF1E2;--plum:#6B5A9E;--plumL:#EFECF8;--teal:#2E7F86;--tealL:#E3F3F4;--slate:#5B6B7D;--slateL:#EEF1F4}
+  *{box-sizing:border-box;margin:0}
+  body{width:1600px;height:810px;font-family:'Atkinson Hyperlegible',sans-serif;color:var(--ink);background:#fff;padding:40px 46px}
+  h1{font-family:Sora,'DejaVu Sans',sans-serif;font-size:30px;letter-spacing:-.02em}
+  .sub{color:var(--ink2);font-size:16px;margin-top:4px}
+  .row{display:grid;grid-template-columns:150px repeat(6,minmax(0,1fr)) 160px;gap:14px;margin-top:30px;align-items:stretch}
+  .io{border:2px dashed var(--line);border-radius:16px;padding:14px;font-size:14px;color:var(--ink2);display:flex;flex-direction:column;justify-content:center;gap:6px}
+  .io b{color:var(--ink);font-size:15px}
+  .st{border-radius:16px;padding:14px 14px 16px;border:2px solid;position:relative;display:flex;flex-direction:column;gap:7px}
+  .st .fam{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+  .st h3{font-family:Sora,'DejaVu Sans',sans-serif;font-size:17px;line-height:1.2}
+  .st p{font-size:13px;line-height:1.45;color:var(--ink2)}
+  .st .n{position:absolute;top:-13px;left:12px;width:26px;height:26px;border-radius:50%;color:#fff;font:700 13px Sora,sans-serif;display:grid;place-items:center}
+  .st:not(:last-child)::after{}
+  .nlp{border-color:var(--teal);background:var(--tealL)} .nlp .fam{color:var(--teal)} .nlp .n{background:var(--teal)}
+  .ml{border-color:var(--sage);background:var(--sageL)} .ml .fam{color:var(--sage)} .ml .n{background:var(--sage)}
+  .dl{border-color:var(--sky);background:var(--skyL)} .dl .fam{color:var(--sky)} .dl .n{background:var(--sky)}
+  .pe{border-color:var(--amber);background:var(--amberL)} .pe .fam{color:var(--amber)} .pe .n{background:var(--amber)}
+  .ga{border-color:var(--plum);background:var(--plumL)} .ga .fam{color:var(--plum)} .ga .n{background:var(--plum)}
+  .sf{border-color:var(--slate);background:var(--slateL)} .sf .fam{color:var(--slate)} .sf .n{background:var(--slate)}
+  .arrows{display:grid;grid-template-columns:150px repeat(6,minmax(0,1fr)) 160px;gap:14px;margin-top:-4px}
+  .sideRow{display:grid;grid-template-columns:150px repeat(6,minmax(0,1fr)) 160px;gap:14px;margin-top:14px}
+  .side{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12.5px;color:var(--ink2);line-height:1.4;background:#FAFCFE}
+  .side b{color:var(--ink)}
+  .obj{display:inline-block;font:700 11px Sora,sans-serif;padding:3px 8px;border-radius:99px;background:#fff;border:1.5px solid var(--line);margin:4px 4px 0 0;color:var(--ink2)}
+  .flowline{position:relative;height:0}
+  .loop{margin-top:22px;border:2px solid var(--ink);border-radius:18px;padding:16px 20px;display:grid;grid-template-columns:auto 1fr 1fr 1fr 1fr;gap:16px;align-items:center}
+  .loop .t{font-family:Sora,'DejaVu Sans',sans-serif;font-weight:800;font-size:16px;writing-mode:horizontal-tb}
+  .loop .c{font-size:13.5px;color:var(--ink2);line-height:1.45;border-left:3px solid var(--line);padding-left:12px}
+  .loop .c b{color:var(--ink);display:block;font-size:14px}
+  .foot{margin-top:16px;display:flex;justify-content:space-between;font-size:13px;color:var(--ink3)}
+  .foot b{color:var(--ink)}
+  svg.arr{position:absolute;pointer-events:none}
+</style></head>
+<body>
+  <h1>SkySathi · GenAI pipeline (v4.1, refined after Review-1)</h1>
+  <p class="sub">One fixed, linear pass per passenger message — every stage is a plain function; the LLM only writes text, it never chooses actions.</p>
+
+  <div class="row" id="row">
+    <div class="io"><b>Input</b>Passenger text<br>EN · हिंदी · Hinglish<br>+ live flight phase, altitude, weather<br>+ audience mode</div>
+    <div class="st nlp"><span class="n">1</span><span class="fam">NLP</span><h3>Preprocess</h3><p>normalise · tokenise · stop-words · language-ID · entities (flight no., IATA, gate)</p></div>
+    <div class="st ml"><span class="n">2</span><span class="fam">Machine learning</span><h3>Passenger-state classifiers</h3><p>TF-IDF word+char n-grams → Logistic Regression<br><b>anxiety</b> calm/raised/high<br><b>intent</b> explain · reassure · panic · logistics</p></div>
+    <div class="st dl"><span class="n">3</span><span class="fam">DL · Transformer</span><h3>Hybrid RAG retrieval</h3><p>BM25 ⊕ MiniLM-L6 sentence embeddings (384-d, cosine) → Reciprocal Rank Fusion → top-3 facts</p></div>
+    <div class="st pe"><span class="n">4</span><span class="fam">Prompt engineering</span><h3>Prompt assembly</h3><p>persona + audience + anxiety policy + few-shot + KB context w/ citations + live state + memory</p></div>
+    <div class="st ga"><span class="n">5</span><span class="fam">Generative AI</span><h3>LLM generation</h3><p>decoder-only transformer (gpt-4o-mini; any OpenAI-compatible) · temperature per task</p></div>
+    <div class="st sf"><span class="n">6</span><span class="fam">Safety</span><h3>Guardrails</h3><p>strip CoT · validate [kb-id] citations · sentence cap · banned words · JSON check · emergency prefix</p></div>
+    <div class="io"><b>Output</b>Calm, cited answer (≤3 sentences when anxious)<br>+ JSON card / journal<br>+ stage-by-stage trace</div>
+  </div>
+
+  <div class="sideRow">
+    <div></div>
+    <div class="side"><b>Why NLP:</b> Hinglish & entities need rules, not a model<div><span class="obj">O4</span></div></div>
+    <div class="side"><b>Why ML (not LLM):</b> &lt;1 ms, explainable, offline, free; panic safety lexicon on top<div><span class="obj">O3</span></div></div>
+    <div class="side"><b>Knowledge base:</b> 18 pilot-reviewed facts (kb/knowledge.yaml) — single source online &amp; offline<div><span class="obj">O1</span></div></div>
+    <div class="side"><b>7 techniques</b> compared in Prompt Lab: zero-shot → role → few-shot → RAG → CoT → JSON → production<div><span class="obj">O2</span><span class="obj">O3</span></div></div>
+    <div class="side"><b>No key / offline:</b> extractive answer composed only from retrieved KB — never a dead end<div><span class="obj">O5</span></div></div>
+    <div class="side"><b>Emergency words</b> (chest pain, smoke…) always start with “press the call button”<div><span class="obj">O1</span></div></div>
+    <div></div>
+  </div>
+
+  <div class="loop">
+    <div class="t">Evaluation &amp;<br>tuning loop<br><span style="font:400 12px 'Atkinson Hyperlegible';color:var(--ink3)">offline, team-run</span></div>
+    <div class="c"><b>Gold eval set</b>25 anxious-flyer questions (EN + Hinglish) labelled with correct KB ids; 197 labelled utterances for the classifiers</div>
+    <div class="c"><b>Measure vs objectives</b>groundedness · citation precision · Flesch · sentence-cap · unsafe rate · F1 · Hit@k / MRR · latency</div>
+    <div class="c"><b>Tune</b>prompt version (pv1→pv3), few-shot set, top-k, temperature, n-gram range &amp; C — RAG + prompting instead of LLM fine-tuning</div>
+    <div class="c"><b>Ship</b>scripts/evaluate.py → eval/REPORT.md, live in the app's Pipeline &amp; Eval tab</div>
+  </div>
+
+  <div class="foot"><span><b>Objectives</b> · O1 grounded reassurance · O2 plain calm language · O3 understand passenger state · O4 Indian languages · O5 always available</span><span>SkySathi · PBL-2 Review-2</span></div>
+
+  <svg class="arr" id="arr" width="1600" height="900" style="left:0;top:0"></svg>
+<script>
+  // draw arrows between consecutive boxes in the main row
+  const kids=[...document.getElementById('row').children], svg=document.getElementById('arr');
+  for(let i=0;i<kids.length-1;i++){
+    const a=kids[i].getBoundingClientRect(), b=kids[i+1].getBoundingClientRect(), y=a.top+a.height/2;
+    svg.insertAdjacentHTML('beforeend',`<line x1="${a.right+1}" y1="${y}" x2="${b.left-3}" y2="${y}" stroke="#14202E" stroke-width="2.2" marker-end="url(#m)"/>`);
+  }
+  svg.insertAdjacentHTML('afterbegin','<defs><marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0L10,5L0,10z" fill="#14202E"/></marker></defs>');
+</script>
+</body></html>

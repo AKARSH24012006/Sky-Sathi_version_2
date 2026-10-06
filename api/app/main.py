@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 
 from .auth import router as auth_router
 from .users import router as users_router, preferences, premium, feedback
-from .ai import router as ai_router
+from .ai import router as ai_router, lab_router as genai_lab_router
 from .flights import router as flights_router
 from .airports import router as airports_router
 from .weather import router as weather_router
@@ -20,9 +20,20 @@ from . import version
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 log = logging.getLogger("skysathi")
 
-app = FastAPI(title="SkySathi API", version="4.0.0",
-              description="Calm flight intelligence: auth, live data, sensors, AI companion.")
+app = FastAPI(title="SkySathi API", version="4.1.0",
+              description="Calm flight intelligence: auth, live data, sensors, and a GenAI pipeline (NLP → ML → RAG → prompt → LLM → guardrails).")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+@app.on_event("startup")
+async def warm_genai():
+    """Train the ML classifiers and load the transformer encoder off the request path."""
+    import asyncio
+    from .ai import classifier, rag
+    async def warm():
+        await asyncio.to_thread(classifier.models)
+        await asyncio.to_thread(rag.retriever_name)
+        log.info("genai warm: classifier + %s", rag.retriever_name())
+    asyncio.create_task(warm())
 
 @app.on_event("startup")
 async def startup():
@@ -61,7 +72,7 @@ async def trace_rate_log(request: Request, call_next):
 
 @app.get("/health", tags=["ops"])
 async def health():
-    return {"ok": True, "service": "skysathi-api", "version": "3.0.0"}
+    return {"ok": True, "service": "skysathi-api", "version": "4.1.0"}
 
 @app.get("/ready", tags=["ops"])
 async def ready():
@@ -85,5 +96,5 @@ async def ready():
 for r in (auth_router.router, users_router.router, preferences.router, premium.router,
           feedback.router, ai_router.router, flights_router.router, airports_router.router,
           weather_router.router, sensors_router.router, notifications_router.router,
-          analytics_router.router, version.router):
+          analytics_router.router, version.router, genai_lab_router.router):
     app.include_router(r)

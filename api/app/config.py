@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     refresh_ttl_days: int = 90
     openai_api_key: str = ""         # optional: chat uses grounded KB fallback without it
     openai_model: str = "gpt-4o-mini"
+    # Any OpenAI-compatible endpoint works (OpenAI, Groq, Gemini's /openai/ endpoint, local Ollama):
+    llm_base_url: str = "https://api.openai.com/v1"
+    llm_api_key: str = ""            # falls back to OPENAI_API_KEY
+    llm_model: str = ""              # falls back to OPENAI_MODEL
     aerodatabox_key: str = ""        # optional: flight status uses demo data without it
     google_client_id: str = ""
     apple_client_id: str = ""

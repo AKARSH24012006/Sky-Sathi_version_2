@@ -1,3 +1,6 @@
-# Optional semantic retrieval (RAG falls back to keyword KB without it):
-#   pip install -r requirements-ai.txt && python scripts/ingest_kb.py
+# Transformer layer for dense retrieval (all-MiniLM-L6-v2, ONNX — no PyTorch needed).
+# Without it, retrieval runs BM25-only and the trace says so.
+#   pip install -r requirements-ai.txt
 chromadb==0.5.*
+# Optional alternative encoder (heavier, pulls PyTorch):
+# sentence-transformers==3.*

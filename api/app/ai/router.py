@@ -1,4 +1,4 @@
-"""AI feature: chat (LLM + KB + memory + RAG), suggestions, offline KB bundle."""
+"""AI feature: chat (GenAI pipeline: NLP -> ML -> RAG -> prompt -> LLM -> guardrails), suggestions, offline KB bundle."""
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from ..db import get_db
@@ -12,22 +12,26 @@ router = APIRouter(prefix="/conversations", tags=["ai"])
 
 class ChatIn(BaseModel):
     conversation_id: str | None = None
-    mode: str = "flight"
+    mode: str = "calm"              # calm | educational | child
     text: str
     live: dict = {}
-    anxiety_band: str = "calm"
+    anxiety_band: str = "auto"      # auto = ML classifier decides; raised/high = floor from sensors
 
 @router.post("/chat")
 async def chat(body: ChatIn, uid: str = Depends(current_user_id), db=Depends(get_db)):
     conv = await db.get(Conversation, body.conversation_id) if body.conversation_id else None
     if conv is None:
-        conv = Conversation(user_id=uid, mode=body.mode)
+        conv = Conversation(user_id=uid, mode="flight")
         db.add(conv); await db.flush()
-    db.add(Message(conversation_id=conv.id, role="user", content=body.text, anxiety_band=body.anxiety_band))
-    reply = await generate_reply(db, uid, conv.id, body)
-    db.add(Message(conversation_id=conv.id, role="assistant", content=reply))
+    db.add(Message(conversation_id=conv.id, role="user", content=body.text,
+                   anxiety_band=body.anxiety_band if body.anxiety_band != "auto" else None))
+    await db.flush()
+    out = await generate_reply(db, uid, conv.id, body)
+    db.add(Message(conversation_id=conv.id, role="assistant", content=out["reply"]))
     await db.commit()
-    return {"conversation_id": conv.id, "reply": reply}
+    return {"conversation_id": conv.id, "reply": out["reply"], "citations": out["citations"],
+            "anxiety": out["anxiety"], "intent": out["intent"], "generator": out["generator"],
+            "total_ms": out["total_ms"], "trace": out["trace"]}
 
 class SuggestIn(BaseModel):
     phase: str = "cruise"

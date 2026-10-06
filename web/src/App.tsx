@@ -1,21 +1,28 @@
-/** SkySathi 4.0 — the complete application.
+/** SkySathi 4.1 — the complete application + GenAI Lab.
  *  Six-tab shell (code-split screens), command palette (⌘K), notification
  *  center, cinematic intro, settings drawer, toasts. Every 3.x feature lives
  *  on inside a screen; no dead buttons — anything unbuilt says so honestly. */
 import { lazy, Suspense, useEffect, useState } from "react";
 import { AppProvider, useApp } from "./store";
+import { session } from "./lib/safeStorage";
+import { DEMO } from "./lib/demo";
+import Icon from "./components/Icon";
+import { snd } from "./lib/sound";
+import { airlineFor } from "./lib/airlines";
 
 const Home = lazy(() => import("./screens/Home"));
 const Flights = lazy(() => import("./screens/Flights"));
 const Journey = lazy(() => import("./screens/Journey"));
+const Airport = lazy(() => import("./screens/Airport"));
 const Copilot = lazy(() => import("./screens/Copilot"));
 const Tickets = lazy(() => import("./screens/Tickets"));
 const Profile = lazy(() => import("./screens/Profile"));
 
+const THEMES = ["auto", "day", "night", "aurora"];
+const THEME_IC: Record<string, string> = { auto: "spark", day: "sun", night: "moon", aurora: "aurora" };
 const TABS = [
-  { id: "home", label: "Home", ic: "⌂" }, { id: "flights", label: "Flights", ic: "⇗" },
-  { id: "journey", label: "Journey", ic: "◎" }, { id: "copilot", label: "Copilot", ic: "✦" },
-  { id: "tickets", label: "Tickets", ic: "▤" }, { id: "profile", label: "Profile", ic: "◉" },
+  { id: "home", label: "Home" }, { id: "flights", label: "Flights" }, { id: "airport", label: "Airport" }, { id: "journey", label: "Journey" },
+  { id: "copilot", label: "Copilot" }, { id: "tickets", label: "Tickets" }, { id: "profile", label: "Profile" },
 ];
 
 function Shell() {
@@ -25,8 +32,8 @@ function Shell() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [palOpen, setPalOpen] = useState(false);
   const [palQ, setPalQ] = useState("");
-  const [intro, setIntro] = useState(() => !sessionStorage.getItem("ss:intro") && !matchMedia("(prefers-reduced-motion: reduce)").matches);
-  const endIntro = () => { setIntro(false); sessionStorage.setItem("ss:intro", "1"); };
+  const [intro, setIntro] = useState(() => !session.get("ss:intro") && !matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const endIntro = () => { setIntro(false); session.set("ss:intro", "1"); };
   useEffect(() => { if (intro) { const t = setTimeout(endIntro, 3600); return () => clearTimeout(t); } }, [intro]);
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
@@ -39,7 +46,7 @@ function Shell() {
   const actions = [
     ...TABS.map(t => ({ label: `Go to ${t.label}`, run: () => setTab(t.id) })),
     { label: "Begin Flight", run: () => { setTab("home"); s.begin(); } },
-    { label: "Toggle sound", run: () => document.getElementById("soundBtn")?.click() },
+    { label: "Toggle sound", run: () => document.getElementById("ambientBtn")?.click() },
     { label: "Open settings", run: () => setSetOpen(true) },
     { label: "Ask: why is turbulence safe?", run: () => { setTab("copilot"); s.ask("Why is turbulence safe?"); } },
   ].filter(a => a.label.toLowerCase().includes(palQ.toLowerCase()));
@@ -49,31 +56,39 @@ function Shell() {
     {intro && <div id="intro3" onClick={endIntro}><div className="lg">SkySathi</div><div className="tg">{s.greet}, Akarsh — preparing your sky…</div></div>}
 
     <div id="app" style={{ paddingBottom: 96 }}>
-      <header>
-        <h1>SkySathi</h1>
-        <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <button className="btn gearbtn" onClick={() => { setPalOpen(true); setPalQ(""); }} aria-label="Search (Ctrl+K)">⌘K</button>
-          <button className="btn gearbtn" style={{ position: "relative" }} onClick={() => setNotifOpen(o => !o)} aria-label="Notifications">
-            ◔{s.notifs.length > 0 && <span className="badge">{s.notifs.length}</span>}</button>
-          <button className="btn gearbtn" onClick={() => setSetOpen(true)}>Settings</button>
+      {DEMO && <p className="previewbar">Preview build · AI answers were pre-computed by the real pipeline in offline mode (no LLM key). Live flight data and login need the local backend.</p>}
+      <header className="topbar">
+        <div className="brand"><span className="logo"><Icon n="plane" s={20} /></span><h1>Sky<span>Sathi</span></h1></div>
+        <span className="routePill"><i className="dot" />DEL → BLR<span className="pill sage">{s.flight?.status ?? "Scheduled"}</span>
+          <span className="rp-dim">{airlineFor(s.flight?.flight_no ?? "AI101")} {s.flight?.flight_no ?? "AI101"}</span></span>
+        <span className="tbtns">
+          <button className="tbtn" onClick={() => { setPalOpen(true); setPalQ(""); }} aria-label="Search (Ctrl+K)"><Icon n="search" s={15} /><span className="hideS">Search</span><kbd>⌘K</kbd></button>
+          <button id="ambientBtn" className={"tbtn" + (s.soundOn ? " on" : "")} onClick={() => s.setSoundOn(snd.toggle())} aria-label="Cabin ambient sound">
+            <Icon n={s.soundOn ? "sound" : "mute"} s={15} /><span className="hideS">Cabin ambient</span></button>
+          <button className="tbtn" onClick={() => s.setPrefs(p => ({ ...p, theme: THEMES[(THEMES.indexOf(p.theme) + 1) % THEMES.length] }))}
+            aria-label="Switch theme" title="Switch theme: auto, day, night, aurora"><Icon n={THEME_IC[s.prefs.theme] ?? "spark"} s={15} /><span className="hideS" style={{ textTransform: "capitalize" }}>{THEMES.includes(s.prefs.theme) ? s.prefs.theme : "auto"}</span></button>
+          <button className="tbtn icon" style={{ position: "relative" }} onClick={() => setNotifOpen(o => !o)} aria-label="Notifications">
+            <Icon n="bell" s={16} />{s.notifs.length > 0 && <span className="badge">{s.notifs.length}</span>}</button>
+          <button className="tbtn" onClick={() => setSetOpen(true)}>Settings</button>
         </span>
       </header>
 
       <Suspense fallback={<div className="card skeleton" style={{ height: 300 }} />}>
         {tab === "home" && <Home go={setTab} />}
         {tab === "flights" && <Flights />}
-        {tab === "journey" && <Journey />}
+        {tab === "airport" && <Airport />}
+        {tab === "journey" && <Journey go={setTab} />}
         {tab === "copilot" && <Copilot />}
         {tab === "tickets" && <Tickets />}
         {tab === "profile" && <Profile openSettings={() => setSetOpen(true)} />}
       </Suspense>
-      <footer>SkySathi 4.0 · the calm space at 36,000 ft · panic button never paywalled</footer>
+      <footer>SkySathi 4.2 · the calm space at 36,000 ft · panic button never paywalled</footer>
     </div>
 
     {/* bottom navigation */}
     <nav id="bottomnav" aria-label="Main">
       {TABS.map(t => <button key={t.id} className={tab === t.id ? "on" : ""} onClick={() => setTab(t.id)}>
-        <span className="nic" aria-hidden>{t.ic}</span>{t.label}</button>)}
+        <Icon n={t.id} s={16} /><span>{t.label}</span></button>)}
     </nav>
 
     {/* notification center */}
@@ -99,8 +114,8 @@ function Shell() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h3>Settings</h3><button className="btn gearbtn" onClick={() => setSetOpen(false)}>Close</button></div>
       <div className="setrow"><span>Theme</span>
-        <select value={s.prefs.theme} onChange={e => s.setPrefs(p => ({ ...p, theme: e.target.value }))}>
-          {["auto", "morning", "day", "sunset", "twilight", "night"].map(t => <option key={t}>{t}</option>)}</select></div>
+        <select value={THEMES.includes(s.prefs.theme) ? s.prefs.theme : "auto"} onChange={e => s.setPrefs(p => ({ ...p, theme: e.target.value }))}>
+          {THEMES.map(t => <option key={t}>{t}</option>)}</select></div>
       <div className="setrow"><span>Animations</span>
         <select value={s.prefs.anim} onChange={e => s.setPrefs(p => ({ ...p, anim: e.target.value }))}>
           <option value="full">full</option><option value="reduced">reduced</option></select></div>

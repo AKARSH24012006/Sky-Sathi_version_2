@@ -27,7 +27,7 @@ import { targetsAt, TOTAL, PHASES, type Phase } from "../lib/sequence";
 /* ---------- shared mutable flight state (updated inside the canvas loop) ---------- */
 export type SeqState = { t: number; playing: boolean };
 export type WeatherFx = { code: number; night?: boolean };   // WMO code from the real arrival weather
-export type Telem = { alt: number; thr: number; progress: number; ground: boolean; turb: boolean };
+export type Telem = { alt: number; thr: number; progress: number; ground: boolean; turb: boolean; pitch: number; bank: number };
 
 const WHITE = "#E9EEF4", BELLY = "#9FB0C2", DARK = "#22303F", ACCENT = "#2E4A6B";
 
@@ -237,7 +237,15 @@ function World({ refs }: { refs: React.MutableRefObject<Record<string, THREE.Obj
 }
 
 /* ================= THE DIRECTOR: one damped rig drives everything ================= */
-function Director({ seq, refs, onPhase, onTelem, wx }: {
+export type CamView = "orbit" | "cockpit" | "wing";
+/* camera rigs in aircraft-local space: [position, look target, fov] — nose is +x, left wing +z */
+const RIGS: Record<Exclude<CamView, "orbit">, [[number, number, number], [number, number, number], number]> = {
+  cockpit: [[2.3, 0.2, 0], [40, -1.2, 0], 62],
+  wing: [[0.75, 0.34, 0.52], [-0.7, -0.25, 2.7], 58],
+};
+
+function Director({ seq, refs, onPhase, onTelem, wx, view }: {
+  view: React.MutableRefObject<CamView>;
   seq: React.MutableRefObject<SeqState>;
   refs: React.MutableRefObject<Record<string, THREE.Object3D | null>>;
   onPhase: (p: Phase, progress: number) => void;
@@ -250,6 +258,7 @@ function Director({ seq, refs, onPhase, onTelem, wx }: {
   const tmp = useMemo(() => new THREE.Vector3(), []);
   const orbit = useRef({ a: 0.6 });
   const telemAt = useRef(0);
+  const look = useMemo(() => new THREE.Vector3(), []);
   const flash = useRef(0);
 
   useFrame((state, dt) => {
@@ -373,7 +382,13 @@ function Director({ seq, refs, onPhase, onTelem, wx }: {
     /* camera: slow orbit while idle (sometimes zooming, sometimes through clouds);
        damped chase with banking + turbulence shake during the flight */
     const shake = T.turb ? 1 : 0;
-    if (idle) {
+    const rig = view.current !== "orbit" ? RIGS[view.current] : null;
+    if (rig) {
+      ac.updateMatrixWorld();
+      ac.localToWorld(tmp.set(...rig[0]));
+      camera.position.lerp(tmp, Math.min(1, k * 2.5));
+      ac.localToWorld(look.set(...rig[1]));
+    } else if (idle) {
       orbit.current.a += dt * 0.07;
       const rad = 9.5 + Math.sin(el * 0.05) * 2.6;             // breathing zoom
       tmp.set(Math.cos(orbit.current.a) * rad, 2.3 + Math.sin(el * 0.11) * 1.4, Math.sin(orbit.current.a) * rad);
@@ -383,11 +398,11 @@ function Director({ seq, refs, onPhase, onTelem, wx }: {
       camera.position.lerp(tmp, k);
     }
     snd.engine(c.thr, T.reverse, c.alt, !!(R.rain && (R.rain as any).visible));
-    if (onTelem && el - telemAt.current > 0.4) { telemAt.current = el; onTelem({ alt: c.alt, thr: c.thr, progress: T.progress, ground: !!T.ground, turb: !!T.turb }); }
-    camera.lookAt(0.6, turbY, 0);
-    camera.rotateZ(THREE.MathUtils.degToRad(c.bank) * 0.32);
+    if (onTelem && el - telemAt.current > 0.4) { telemAt.current = el; onTelem({ alt: c.alt, thr: c.thr, progress: T.progress, ground: !!T.ground, turb: !!T.turb, pitch: c.pitch, bank: c.bank }); }
+    if (rig) camera.lookAt(look);
+    else { camera.lookAt(0.6, turbY, 0); camera.rotateZ(THREE.MathUtils.degToRad(c.bank) * 0.32); }
     const pc = camera as THREE.PerspectiveCamera;
-    const wantFov = 46 + c.thr * 5 + shake * 1.5;
+    const wantFov = rig ? rig[2] : 46 + c.thr * 5 + shake * 1.5;
     pc.fov += (wantFov - pc.fov) * k; pc.updateProjectionMatrix();
   });
   return null;
@@ -400,13 +415,16 @@ function GltfPlane({ refs, url }: { refs: React.MutableRefObject<Record<string, 
 }
 
 /* ================= PUBLIC COMPONENT ================= */
-export default function FlightScene({ seq, onPhase, onTelem, wx }: {
+export default function FlightScene({ seq, onPhase, onTelem, wx, view = "orbit" }: {
+  view?: CamView;
   seq: React.MutableRefObject<SeqState>;
   onPhase: (p: Phase, progress: number) => void;
   onTelem?: (t: Telem) => void;
   wx?: WeatherFx;
 }) {
   const refs = useRef<Record<string, THREE.Object3D | null>>({});
+  const viewRef = useRef<CamView>(view);
+  viewRef.current = view;
   const [gltfUrl, setGltfUrl] = React.useState<string | null>(null);
   React.useEffect(() => {   // use a real model when present; procedural otherwise
     fetch("/models/a320.glb", { method: "HEAD" }).then(r => {
@@ -419,7 +437,7 @@ export default function FlightScene({ seq, onPhase, onTelem, wx }: {
   const sunPos: [number, number, number] = [Math.cos(d * Math.PI) * 100, Math.sin(d * Math.PI) * (night ? 4 : 45) + (night ? -6 : 6), 40];
   return (
     <Canvas dpr={[1, 2]} camera={{ position: [-7.5, 2.4, 2.2], fov: 46 }} gl={{ antialias: true }}
-            style={{ borderRadius: 18 }} shadows={false}>
+            style={{ borderRadius: "inherit" }} shadows={false}>
       {/* flare sits at the sun via prop below */}
       <Sky distance={4500} sunPosition={sunPos} turbidity={6} rayleigh={night ? 0.4 : 1.6} mieCoefficient={0.004} mieDirectionalG={0.85} />
       <Stars radius={300} depth={60} count={2400} factor={3} fade speed={0.6} />
@@ -430,7 +448,7 @@ export default function FlightScene({ seq, onPhase, onTelem, wx }: {
         ? <React.Suspense fallback={<ProceduralA320 refs={refs} />}><GltfPlane refs={refs} url={gltfUrl} /></React.Suspense>
         : <ProceduralA320 refs={refs} />}
       <World refs={refs} />
-      <Director seq={seq} refs={refs} onPhase={onPhase} onTelem={onTelem} wx={wx} />
+      <Director seq={seq} refs={refs} onPhase={onPhase} onTelem={onTelem} wx={wx} view={viewRef} />
     </Canvas>
   );
 }

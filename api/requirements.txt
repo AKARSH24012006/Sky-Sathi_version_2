@@ -11,3 +11,5 @@ pgvector==0.3.*
 pyyaml==6.*
 email-validator==2.*
 openai==1.*  # (called via httpx; sdk listed for scripts)
+scikit-learn==1.*  # ML layer: TF-IDF + Logistic Regression classifiers
+numpy==2.*
