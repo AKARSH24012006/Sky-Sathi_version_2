@@ -6,12 +6,10 @@ services:
     name: skysathi-api
     runtime: docker
     plan: free
-    dockerfilePath: ./api/Dockerfile
-    dockerContext: ./api
+    dockerfilePath: ./api/Dockerfile.render
+    dockerContext: .
     healthCheckPath: /health
     envVars:
-      - key: WITH_DENSE          # Render passes env vars to the Docker build; skip the 300 MB encoder on the free 512 MB plan (BM25 retrieval still runs)
-        value: "0"
       - key: JWT_SECRET
         generateValue: true
       - key: OPENAI_API_KEY      # optional — without it answers come from the knowledge base

@@ -1,0 +1,12 @@
+# Render image: built from the repo root so the pilot-reviewed knowledge base (kb/) ships
+# inside the image (docker compose mounts it as a volume instead). Free plan → no dense encoder.
+FROM python:3.12-slim
+WORKDIR /srv
+COPY api/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY api/app ./app
+COPY api/scripts ./scripts
+COPY kb ./kb
+ENV KB_PATH=/srv/kb/knowledge.yaml
+RUN mkdir -p eval
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
