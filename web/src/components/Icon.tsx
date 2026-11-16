@@ -24,6 +24,7 @@ const P: Record<string, string> = {
   breath: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
   chev: "M9 18l6-6-6-6",
   airport: "M9 4 3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14",
+  delays: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2",
   aurora: "M3 17c3-6 6-9 9-9s6 3 9 9M3 12c3-4 6-6 9-6s6 2 9 6M6 21h12",
 };
 export default function Icon({ n, s = 18 }: { n: string; s?: number }) {

@@ -17,11 +17,12 @@ const Airport = lazy(() => import("./screens/Airport"));
 const Copilot = lazy(() => import("./screens/Copilot"));
 const Tickets = lazy(() => import("./screens/Tickets"));
 const Profile = lazy(() => import("./screens/Profile"));
+const Delays = lazy(() => import("./screens/Delays"));
 
 const THEMES = ["auto", "day", "night", "aurora"];
 const THEME_IC: Record<string, string> = { auto: "spark", day: "sun", night: "moon", aurora: "aurora" };
 const TABS = [
-  { id: "home", label: "Home" }, { id: "flights", label: "Flights" }, { id: "airport", label: "Airport" }, { id: "journey", label: "Journey" },
+  { id: "home", label: "Home" }, { id: "flights", label: "Flights" }, { id: "airport", label: "Airport" }, { id: "journey", label: "Journey" }, { id: "delays", label: "Delays" },
   { id: "copilot", label: "Copilot" }, { id: "tickets", label: "Tickets" }, { id: "profile", label: "Profile" },
 ];
 
@@ -48,6 +49,7 @@ function Shell() {
     { label: "Begin Flight", run: () => { setTab("home"); s.begin(); } },
     { label: "Toggle sound", run: () => document.getElementById("ambientBtn")?.click() },
     { label: "Open settings", run: () => setSetOpen(true) },
+    { label: "Will my flight be delayed? (Delay Intelligence)", run: () => setTab("delays") },
     { label: "Ask: why is turbulence safe?", run: () => { setTab("copilot"); s.ask("Why is turbulence safe?"); } },
   ].filter(a => a.label.toLowerCase().includes(palQ.toLowerCase()));
 
@@ -79,6 +81,7 @@ function Shell() {
         {tab === "airport" && <Airport />}
         {tab === "journey" && <Journey go={setTab} />}
         {tab === "copilot" && <Copilot />}
+        {tab === "delays" && <Delays />}
         {tab === "tickets" && <Tickets />}
         {tab === "profile" && <Profile openSettings={() => setSetOpen(true)} />}
       </Suspense>

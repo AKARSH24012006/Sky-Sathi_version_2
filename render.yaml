@@ -1,0 +1,18 @@
+# Render Blueprint — free backend for SkySathi (Dashboard → New → Blueprint → pick this repo).
+# Runs without Postgres/Redis: the GenAI Lab, Delay Intelligence (ML PBL-1/2/3), weather and
+# flight lookups all work; login/chat history need a database (add one later via DATABASE_URL).
+services:
+  - type: web
+    name: skysathi-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./api/Dockerfile
+    dockerContext: ./api
+    healthCheckPath: /health
+    envVars:
+      - key: WITH_DENSE          # Render passes env vars to the Docker build; skip the 300 MB encoder on the free 512 MB plan (BM25 retrieval still runs)
+        value: "0"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OPENAI_API_KEY      # optional — without it answers come from the knowledge base
+        sync: false

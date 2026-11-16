@@ -10,5 +10,6 @@ COPY scripts ./scripts
 COPY tests ./tests
 RUN mkdir -p eval
 EXPOSE 8000
-HEALTHCHECK --interval=10s --timeout=3s --retries=10 CMD python -c "import urllib.request;urllib.request.urlopen('http://localhost:8000/health')"
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+HEALTHCHECK --interval=10s --timeout=3s --retries=10 CMD python -c "import urllib.request;urllib.request.urlopen('http://localhost:'+__import__('os').environ.get('PORT','8000')+'/health')"
+# $PORT is set by hosts like Render; 8000 locally / in docker compose
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

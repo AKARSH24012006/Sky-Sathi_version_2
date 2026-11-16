@@ -25,6 +25,25 @@ creates its own tables on first boot. Optional keys (all degrade gracefully):
 `OPENAI_API_KEY` or `LLM_BASE_URL`/`LLM_API_KEY`/`LLM_MODEL` for any OpenAI-compatible model (LLM generation; without it, answers are extractive from the grounded KB),
 `AERODATABOX_KEY` (live gates — without it, clearly-badged demo data).
 
+## What's new in 4.5: Delay Intelligence (ML course PBL-1 · PBL-2 · PBL-3)
+New **Delays** tab — "will my flight be late?", answered by our ML course models and explained calmly by the GenAI copilot.
+
+| Project | What it does in the app | Code |
+|---|---|---|
+| PBL-1 | Regression (Linear, Decision Tree, Random Forest) → expected delay minutes; classification (Logistic, Decision Tree, Random Forest) → chance of arriving 15+ min late | `api/scripts/train_delay_models.py` |
+| PBL-2 | K-Means flight profiles (k = 4); Categorical **HMM "delay ripple"** — the airline's hidden network state (Calm / Building / Congested) from its hourly delay levels | `api/app/delayml/engine.py` |
+| PBL-3 | Bagging, Extra Trees, Gradient Boosting, Soft Voting, Stacking — shown as a model committee, plus the live-features finding | `web/src/screens/Delays.tsx` |
+| GenAI | `POST /delayml/explain` hands the forecast to the 6-stage pipeline as live context; the copilot explains it calmly | `api/app/delayml/router.py` |
+
+Data: the course dataset (`flight_data_2018_to_2022.csv`, 526,894 usable US flights, Jan 2022); time split train 1–17 / valid 18–21 / test 22–31 Jan.
+All models are exported to one JSON (`api/app/delayml/delay_models.json`, copied to `web/public/`) that the backend (numpy) and the browser (TypeScript)
+evaluate identically — so the Delays tab works even when the backend is asleep. Retrain: `python api/scripts/train_delay_models.py path/to/csv`.
+API: `GET /delayml/overview` · `POST /delayml/predict` · `POST /delayml/ripple` · `POST /delayml/explain`.
+
+## Deploy (free)
+- **Backend → Render:** Dashboard → New → Blueprint → this repo (`render.yaml`). URL: `https://skysathi-api.onrender.com`.
+- **Frontend → Netlify:** Add new site → Import from GitHub → base directory `web` (`web/netlify.toml` does the rest; `/api/*` is proxied to Render).
+
 ## Architecture
 
 ```

@@ -1,0 +1,19 @@
+# Netlify: base directory = web
+[build]
+  command = "npm run build"
+  publish = "dist"
+[build.environment]
+  VITE_DEMO = "1"          # if the backend is asleep, every screen still works from bundled data
+  NODE_VERSION = "20"
+
+# /api/* is proxied to the Render backend (same-origin, so no CORS setup needed).
+# Change the URL if your Render service got a different name.
+[[redirects]]
+  from = "/api/*"
+  to = "https://skysathi-api.onrender.com/:splat"
+  status = 200
+  force = true
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

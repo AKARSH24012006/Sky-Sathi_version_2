@@ -73,3 +73,7 @@
   tags: backup backups systems fail redundancy hydraulics computer
   text: Everything critical on an airliner exists at least twice — hydraulics, electrics, computers, even the pilots — under a design rule that no single failure may ever be dangerous.
   calm: Redundancy is the entire philosophy of aircraft design.
+- id: delays
+  tags: delay delayed late waiting wait gate hold holding departure postponed ripple schedule congestion
+  text: Most delays come from the schedule rather than the aircraft — a late incoming plane, a busy hour at the airport, or weather elsewhere in the network ripples through the day. A delay is not a sign that your aircraft is unsafe; any technical check is finished before the doors close.
+  calm: Waiting at the gate is time the system is using to keep every flight safely spaced.

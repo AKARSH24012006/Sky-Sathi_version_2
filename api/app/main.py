@@ -15,6 +15,7 @@ from .weather import router as weather_router
 from .sensors import router as sensors_router
 from .notifications import router as notifications_router
 from .analytics import router as analytics_router
+from .delayml import router as delayml_router
 from . import version
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -96,5 +97,5 @@ async def ready():
 for r in (auth_router.router, users_router.router, preferences.router, premium.router,
           feedback.router, ai_router.router, flights_router.router, airports_router.router,
           weather_router.router, sensors_router.router, notifications_router.router,
-          analytics_router.router, version.router, genai_lab_router.router):
+          analytics_router.router, version.router, genai_lab_router.router, delayml_router.router):
     app.include_router(r)
